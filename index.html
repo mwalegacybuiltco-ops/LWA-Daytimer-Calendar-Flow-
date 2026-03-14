@@ -477,3 +477,53 @@ async function saveLwaLead() {
 }
 
 </script>
+<script>
+
+<input id="lwaLeadName" type="text" placeholder="Lead Name">
+<input id="lwaLeadPlatform" type="text" placeholder="Platform">
+<input id="lwaLeadStatus" type="text" placeholder="Status">
+<textarea id="lwaLeadNotes" placeholder="Notes"></textarea>
+<button id="saveLwaLeadBtn" type="button">Save LWA Lead</button>
+  document.addEventListener("DOMContentLoaded", function () {
+  const saveBtn = document.getElementById("saveLwaLeadBtn");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", saveLwaLead);
+  }
+});
+  <div id="lwaLeadsList"></div>
+  async function renderLwaLeads() {
+  const rows = await syncLoadRows("LWA_Leads");
+  const container = document.getElementById("lwaLeadsList");
+
+  if (!container) return;
+
+  if (!rows.length) {
+    container.innerHTML = "<p>No synced LWA leads yet.</p>";
+    return;
+  }
+
+  container.innerHTML = rows.map(row => `
+    <div class="saved-card">
+      <strong>${escapeHtml(row.name || "")}</strong><br>
+      Platform: ${escapeHtml(row.platform || "")}<br>
+      Status: ${escapeHtml(row.status || "")}<br>
+      Date: ${escapeHtml(row.date_added || "")}<br>
+      Notes: ${escapeHtml(row.notes || "")}
+    </div>
+  `).join("");
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+  document.addEventListener("DOMContentLoaded", function () {
+  loadSyncSettingsForm();
+  renderLwaLeads();
+});
+  loadSyncSettingsForm();
+renderLwaLeads();
