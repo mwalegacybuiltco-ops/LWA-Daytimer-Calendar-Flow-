@@ -408,34 +408,26 @@ async function syncLoadRows(sheet) {
 /* ===== END SYNC HELPERS ===== */
 
 </script>
+
+<script><script>
+
+/* sync helpers */
+
+function getSyncSettings() {
+...
+}
+
+/* sync settings */
+
 function saveSyncSettings() {
-  const appsScriptUrl = document.getElementById("appsScriptUrl").value.trim();
-  const sheetLabel = document.getElementById("sheetLabel").value.trim();
-  const privateNotes = document.getElementById("syncPrivateNotes").value.trim();
-
-  const settings = {
-    appsScriptUrl,
-    sheetLabel,
-    privateNotes
-  };
-
-  localStorage.setItem("legacybuilt_sync_settings", JSON.stringify(settings));
-  alert("Sync settings saved.");
+...
 }
 
 function loadSyncSettingsForm() {
-  const settings = getSyncSettings();
-  if (!settings) return;
-
-  const urlEl = document.getElementById("appsScriptUrl");
-  const labelEl = document.getElementById("sheetLabel");
-  const notesEl = document.getElementById("syncPrivateNotes");
-
-  if (urlEl) urlEl.value = settings.appsScriptUrl || "";
-  if (labelEl) labelEl.value = settings.sheetLabel || "";
-  if (notesEl) notesEl.value = settings.privateNotes || "";
+...
 }
-<script>
+
+</script>
 
 /* STEP 5 — SAVE LWA LEAD TO GOOGLE SHEET */
 
