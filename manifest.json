@@ -1,0 +1,21 @@
+{
+  "name": "LegacyBuilt Daytimer PWA",
+  "short_name": "Daytimer",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#5b2a86",
+  "description": "Planner-style lead tracker, calendar, weekly dashboard, and affiliate pipeline PWA.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#5b2a86" />
+  <title>LegacyBuilt Daytimer PWA</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root{
+      --bg:#0f1117;--panel:#171a22;--panel-2:#1e2230;--text:#f4f5f7;--muted:#a7afbf;--accent:#7c3aed;--accent-2:#f5b942;--line:#2d3343;--danger:#ff6b6b;--ok:#4ade80;--warn:#fbbf24;--radius:18px;--shadow:0 8px 30px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#0b0d12,#121723);color:var(--text)}
+    .app{display:grid;grid-template-columns:290px 1fr;min-height:100vh} aside{background:rgba(18,22,31,.95);border-right:1px solid var(--line);padding:20px;position:sticky;top:0;height:100vh;overflow:auto}
+    .brand-card{background:linear-gradient(180deg,#22183b,#171a22);border:1px solid #3e2f65;border-radius:24px;padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+    .brand-card h1{font-size:1.1rem;margin:0 0 8px} .brand-card p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.4}
+    .nav{display:flex;flex-direction:column;gap:8px}.nav button{all:unset;display:block;padding:12px 14px;border-radius:14px;color:var(--text);cursor:pointer;border:1px solid transparent}.nav button:hover,.nav button.active{background:var(--panel-2);border-color:var(--line)}
+    main{padding:22px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;flex-wrap:wrap}.title-wrap h2{margin:0;font-size:1.7rem}.title-wrap p{margin:6px 0 0;color:var(--muted)}
+    .quick-actions{display:flex;gap:10px;flex-wrap:wrap} button,.btn{background:var(--accent);color:#fff;border:none;border-radius:14px;padding:11px 14px;font-weight:600;cursor:pointer} button.secondary,.btn.secondary{background:#252b39} button.gold{background:var(--accent-2);color:#171717}
+    .grid{display:grid;gap:16px}.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .card{background:rgba(23,26,34,.95);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)} .card h3{margin:0 0 12px;font-size:1.05rem}
+    .muted{color:var(--muted)} .metric{font-size:2rem;font-weight:800;margin:6px 0}.section{display:none}.section.active{display:block}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px} label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:5px}
+    input,textarea,select{width:100%;background:#0f131c;border:1px solid var(--line);color:var(--text);padding:11px 12px;border-radius:12px;outline:none} textarea{min-height:100px;resize:vertical} .wide{grid-column:1/-1}
+    .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}.item{background:#11151e;border:1px solid var(--line);border-radius:14px;padding:12px}.row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .pill{display:inline-block;padding:4px 9px;border-radius:999px;font-size:.78rem;font-weight:700;background:#232838;color:#e7e9ee;margin-right:6px}.pill.ok{background:rgba(74,222,128,.15);color:var(--ok)}.pill.warn{background:rgba(251,191,36,.15);color:var(--warn)}.pill.danger{background:rgba(255,107,107,.15);color:var(--danger)}
+    .tiny{font-size:.82rem;color:var(--muted)}.week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}.day-box{background:#11151e;border:1px solid var(--line);border-radius:14px;padding:10px;min-height:150px}.day-box h4{margin:0 0 8px;font-size:.95rem}
+    .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.cal-head,.cal-day{background:#11151e;border:1px solid var(--line);border-radius:14px;padding:10px;min-height:105px}.cal-head{min-height:auto;text-align:center;font-weight:700;color:var(--muted)}.cal-day .num{font-weight:800;margin-bottom:6px}.badge{display:block;font-size:.72rem;padding:4px 6px;border-radius:8px;margin-top:4px;background:#292f40;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.clickable{cursor:pointer}.clickable:hover{outline:1px solid var(--accent-2)}.highlight{outline:2px solid var(--accent-2);box-shadow:0 0 0 3px rgba(245,185,66,.15)}
+    .agenda-list .item{display:flex;justify-content:space-between;align-items:flex-start}.split{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.kpi-bar{height:10px;background:#10141c;border-radius:999px;overflow:hidden;border:1px solid var(--line)}.kpi-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.small{padding:8px 10px;border-radius:10px;font-size:.85rem}.footer-note{margin-top:12px;color:var(--muted);font-size:.8rem}.success{margin-top:10px;color:var(--ok);font-size:.85rem}.danger-text{color:var(--danger)} .subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.subtabs button.active{background:var(--accent-2);color:#161616}
+    @media (max-width:1100px){.grid.cols-3,.split,.grid.cols-2,.form-grid{grid-template-columns:1fr}.week-grid{grid-template-columns:1fr}.app{grid-template-columns:1fr}aside{position:relative;height:auto}.calendar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:16px;z-index:9999}
+.modal.open{display:flex}
+.modal-card{width:min(780px,100%);max-height:85vh;overflow:auto;background:#161616;border:1px solid #3c3321;border-radius:18px;padding:16px;box-shadow:0 10px 35px rgba(0,0,0,.35)}
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand-card">
+        <h1 id="sideBrand">LegacyBuilt Daytimer</h1>
+        <p>Planner-style PWA for leads, follow-ups, weekly flow, content, and affiliate tracking.</p>
+      </div>
+      <nav class="nav" id="nav"></nav>
+      <div class="footer-note">All data saves on your device with IndexedDB. Use JSON backup for manual transfer, or add your own Sync Settings to connect your own Google Apps Script setup privately.</div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div class="title-wrap">
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSubtitle">Your all-in-one daytimer for LWA and your business.</p>
+        </div>
+        <div class="quick-actions">
+          <button class="secondary" id="exportBtn" type="button">Download Backup JSON</button>
+          <label class="btn secondary" for="importInput">Upload Backup JSON</label>
+          <input id="importInput" type="file" accept="application/json" hidden />
+          <button class="secondary" id="openSyncBtn" type="button">Sync Settings</button>
+          <button class="gold" id="installBtn" style="display:none" type="button">Install App</button>
+        </div>
+      </div>
+      <section class="section active" id="dashboard"></section>
+      <section class="section" id="lead-tracker"></section>
+      <section class="section" id="your-business"></section>
+      <section class="section" id="calendar"></section>
+      <section class="section" id="brand-settings"></section>
+      <section class="section" id="weekly-dashboard"></section>
+      <section class="section" id="weekly-flow"></section>
+      <section class="section" id="daily-tracker"></section>
+      <section class="section" id="affiliate-health"></section>
+      <section class="section" id="ambassador-pipeline"></section>
+      <section class="section" id="reflection-section"></section>
+      <section class="section" id="sync-settings"></section>
+    </main>
+  </div>
+<script>
+const sections = [
+  {id:'dashboard', label:'Dashboard', subtitle:'Snapshot of leads, follow-ups, content, and daily priorities.'},
+  {id:'lead-tracker', label:'LWA Lead Tracker', subtitle:'Track LWA leads, auto-create follow-ups, and manage action steps.'},
+  {id:'your-business', label:'Your Business', subtitle:'Editable business tab with its own tracker, products, content, and pipeline.'},
+  {id:'calendar', label:'Calendar', subtitle:'See daily leads, follow-ups, content, and tasks in one place.'},
+  {id:'brand-settings', label:'Brand Settings', subtitle:'Save brand name, tagline, platforms, colors, and voice notes.'},
+  {id:'weekly-dashboard', label:'Weekly Dashboard', subtitle:'Editable overview for each day of the week.'},
+  {id:'weekly-flow', label:'Weekly Flow', subtitle:'Keep your weekly process visible and move tasks through your flow.'},
+  {id:'daily-tracker', label:'Daily Tracker', subtitle:'Track daily non-negotiables, content, outreach, and platform activity.'},
+  {id:'affiliate-health', label:'Affiliate Health', subtitle:'Measure activity, track affiliate pipeline, and watch conversion signals.'},
+  {id:'ambassador-pipeline', label:'Ambassador Pipeline', subtitle:'Track ambassadors from contact to active status.'},
+  {id:'reflection-section', label:'Reflection Section', subtitle:'Capture wins, lessons, gratitude, and tomorrow’s focus.'},
+  {id:'sync-settings', label:'Sync Settings', subtitle:'Add your own Google Apps Script Web App URL so your own phone and computer can sync privately.'}
+];
+
+let deferredPrompt = null;
+const defaultState = () => ({
+  settings:{businessName:'Your Business',brandName:'LegacyBuilt Daytimer',tagline:'',colors:'',voice:'',platforms:[]},
+  leads:[], businessLeads:[], tasks:[], content:[], businessContent:[], weekly:{}, weeklyFlow:[], daily:{},
+  affiliate:{goal:20,outreach:0,followUps:0,enrollments:0,notes:''}, affiliatePipeline:[], ambassadors:[], reflections:[],
+  business:{name:'Your Business',offer:'',goal:'',platform:'',product:'',notes:''}, businessAffiliatePipeline:[], currentMonth:'', selectedCalendarItemId:'',
+  syncSettings:{provider:'Google Apps Script',webAppUrl:'',sheetName:'',notes:'',lastTest:'',lastStatus:''}
+});
+const state = defaultState();
+const DB_NAME = 'legacybuilt_daytimer_db_v3'; const STORE = 'appState'; let db;
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1); req.onupgradeneeded=()=>{const d=req.result; if(!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE);}; req.onsuccess=()=>{db=req.result;resolve();}; req.onerror=()=>reject(req.error);});}
+function saveState(){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(JSON.parse(JSON.stringify(state)),'main'); tx.oncomplete=()=>resolve(); tx.onerror=()=>reject(tx.error);});}
+function loadState(){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'); const req=tx.objectStore(STORE).get('main'); req.onsuccess=()=>{if(req.result){Object.assign(state, defaultState(), req.result); state.settings = Object.assign(defaultState().settings, req.result.settings||{}); state.business = Object.assign(defaultState().business, req.result.business||{}); state.syncSettings = Object.assign(defaultState().syncSettings, req.result.syncSettings||{});} resolve();}; req.onerror=()=>reject(req.error);});}
+function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function addDays(dateStr, days){ const d = new Date(dateStr+'T12:00:00'); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+function fmtDate(dateStr){ return new Date(dateStr+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
+function esc(s=''){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+function toast(id,msg){ const el=document.getElementById(id); if(el){ el.textContent=msg; setTimeout(()=>{ if(el.textContent===msg) el.textContent=''; },2200);} }
+function navRender(){ const nav=document.getElementById('nav'); nav.innerHTML=sections.map((s,i)=>`<button class="${i===0?'active':''}" data-target="${s.id}">${s.label}</button>`).join(''); nav.querySelectorAll('button').forEach(btn=>btn.onclick=()=>showSection(btn.dataset.target)); }
+function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active', s.id===id)); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.target===id)); const info=sections.find(s=>s.id===id); document.getElementById('pageTitle').textContent=info.label; document.getElementById('pageSubtitle').textContent=info.subtitle; renderAll(id); }
+
+function resolveCalendarItem(id){
+  if(!id) return null;
+  const task = state.tasks.find(t=>t.id===id || ('task-'+t.id)===id || t.id===String(id).replace(/^task-/,''));
+  if(task) return {item:{...task,kind:task.kind||'task'}, targetSection:'calendar', targetDomId:'calendarTaskDetail'};
+  const lead = state.leads.find(l=>l.id===id || ('lead-'+l.id)===id || String(id).startsWith('lwa-'+l.id));
+  if(lead) return {item:{...lead,kind:'lead',title:'LWA lead: '+lead.name}, targetSection:'lead-tracker', targetDomId:'lead-item-'+lead.id};
+  const bizLead = state.businessLeads.find(l=>l.id===id || ('bizlead-'+l.id)===id || String(id).startsWith('biz-'+l.id));
+  if(bizLead) return {item:{...bizLead,kind:'lead',title:(state.business.name||state.settings.businessName||'Business')+': '+bizLead.name}, targetSection:'your-business', targetDomId:'bizlead-item-'+bizLead.id};
+  const content = state.content.find(c=>c.id===id || ('content-'+c.id)===id);
+  if(content) return {item:{...content,kind:'content',title:'Content: '+content.title}, targetSection:'lead-tracker', targetDomId:'content-item-'+content.id};
+  const bizContent = state.businessContent.find(c=>c.id===id || ('bizcontent-'+c.id)===id);
+  if(bizContent) return {item:{...bizContent,kind:'content',title:'Business content: '+bizContent.title}, targetSection:'your-business', targetDomId:'bizcontent-item-'+bizContent.id};
+  return null;
+}
+function scrollToAndHighlight(domId){
+  setTimeout(()=>{
+    const target=document.getElementById(domId);
+    if(target){
+      document.querySelectorAll('.highlight').forEach(el=>el.classList.remove('highlight'));
+      target.classList.add('highlight');
+      target.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  }, 80);
+}
+function openCalendarItem(id){
+  state.selectedCalendarItemId=id;
+  const found=resolveCalendarItem(id);
+  if(!found){ renderAll('calendar'); return; }
+  if(found.targetSection==='calendar'){
+    renderAll('calendar');
+    scrollToAndHighlight('calendarTaskDetail');
+    return;
+  }
+  renderAll(found.targetSection);
+  scrollToAndHighlight(found.targetDomId);
+}
+window.openCalendarItem = openCalendarItem;
+function makeFollowups(record,prefix,kind,displayName,source){ return [1,2,3,30].map(day=>({id:`${prefix}-${record.id}-${day}`,kind:'followup',title:`${displayName} ${day===30?'30 day':'Follow-up '+(day*24)+' hr'}`,date:addDays(record.date,day),leadId:record.id,source:source||'',category:kind})); }
+function allCalendarItems(){
+  const items=[];
+  state.tasks.forEach(t=>items.push({...t,kind:t.kind||'task'}));
+  state.leads.forEach(l=>{items.push({id:'lead-'+l.id,kind:'lead',title:'LWA lead: '+l.name,date:l.date,source:l.source||'',status:l.status}); items.push(...makeFollowups(l,'lwa','lwa',l.name,l.source));});
+  state.businessLeads.forEach(l=>{items.push({id:'bizlead-'+l.id,kind:'lead',title:(state.business.name||state.settings.businessName||'Business')+': '+l.name,date:l.date,source:l.source||'',status:l.status}); items.push(...makeFollowups(l,'biz','business',l.name,l.source));});
+  state.content.forEach(c=>items.push({id:'content-'+c.id,kind:'content',title:'Content: '+c.title,date:c.date,platforms:c.platforms||'',notes:c.description||c.notes||''}));
+  state.businessContent.forEach(c=>items.push({id:'bizcontent-'+c.id,kind:'content',title:'Business content: '+c.title,date:c.date,platforms:c.platforms||'',notes:c.description||c.notes||''}));
+  return items.sort((a,b)=>a.date.localeCompare(b.date));
+}
+function renderDashboard(){ const el=document.getElementById('dashboard'); const items=allCalendarItems(); const today=todayStr(); const leadsToday=items.filter(i=>i.kind==='lead'&&i.date===today).length; const tasksToday=items.filter(i=>i.date===today).length; const followups7=items.filter(i=>i.kind==='followup'&&i.date>=today&&i.date<=addDays(today,7)).length; const contentThisWeek=items.filter(i=>i.kind==='content'&&i.date>=today&&i.date<=addDays(today,6)).length; const agenda=items.filter(i=>i.date===today).slice(0,12);
+  el.innerHTML=`<div class="grid cols-3"><div class="card"><div class="muted">Today's Lead Adds</div><div class="metric">${leadsToday}</div></div><div class="card"><div class="muted">Today's Agenda</div><div class="metric">${tasksToday}</div></div><div class="card"><div class="muted">Upcoming Follow-ups (7 days)</div><div class="metric">${followups7}</div></div></div>
+  <div class="grid cols-2" style="margin-top:16px"><div class="card"><h3>Today at a Glance</h3><div class="list agenda-list">${agenda.length?agenda.map(a=>`<div class="item"><div><strong>${esc(a.title)}</strong><div class="tiny">${esc(a.kind)} • ${fmtDate(a.date)}</div></div><span class="pill ${a.kind==='followup'?'warn':a.kind==='lead'?'ok':a.kind==='content'?'':'danger'}">${esc(a.kind)}</span></div>`).join(''):'<div class="muted">No items due today yet.</div>'}</div></div>
+  <div class="card"><h3>Weekly Pulse</h3><p class="muted">Business: <strong>${esc(state.business.name || state.settings.businessName || 'Your Business')}</strong></p><p class="muted">Content items tracked: <strong>${state.content.length + state.businessContent.length}</strong></p><p class="muted">LWA leads: <strong>${state.leads.length}</strong></p><p class="muted">Business leads: <strong>${state.businessLeads.length}</strong></p><p class="muted">Tasks saved: <strong>${state.tasks.length}</strong></p></div></div>`;
+}
+function leadFormHtml(formId,prefix){ return `<form id="${formId}" class="form-grid"><div><label>Name</label><input name="name" required /></div><div><label>Source</label><input name="source" placeholder="FB, TT, referral..." /></div><div><label>Date</label><input type="date" name="date" value="${todayStr()}" required /></div><div><label>Status</label><select name="status"><option>New</option><option>Warm</option><option>Watching</option><option>Follow Up</option><option>Closed</option></select></div><div><label>Product / Offer</label><input name="product" placeholder="Offer, product, bundle..." /></div><div><label>Next Action</label><input name="nextAction" placeholder="Message, call, send info" /></div><div class="wide"><label>Notes</label><textarea name="notes" placeholder="What did they say? What is the next move?"></textarea></div><div class="wide"><button type="submit">Save ${prefix} Lead + 24/48/72/30 Follow-ups</button><div class="success" id="${formId}Msg"></div></div></form>`; }
+function contentFormHtml(formId,label){ return `<form id="${formId}" class="form-grid"><div><label>Content Title</label><input name="title" required /></div><div><label>Date</label><input type="date" name="date" value="${todayStr()}" required /></div><div><label>Type</label><select name="type"><option>Post</option><option>Story</option><option>Live</option><option>Reel</option><option>Email</option><option>Video</option></select></div><div><label>Where Posted</label><input name="platforms" placeholder="Facebook, TikTok, IG..." /></div><div><label>Likes</label><input type="number" name="likes" value="0" /></div><div><label>Comments</label><input type="number" name="comments" value="0" /></div><div><label>Shares</label><input type="number" name="shares" value="0" /></div><div><label>Saves / DMs</label><input type="number" name="saves" value="0" /></div><div class="wide"><label>Description / What you posted</label><textarea name="description"></textarea></div><div class="wide"><button type="submit">Save ${label} Content</button><div class="success" id="${formId}Msg"></div></div></form>`; }
+function leadListHtml(arr,business=false){ return `<div class="list">${arr.length?arr.slice().reverse().map(l=>`<div class="item" id="${business?'bizlead-item-':'lead-item-'}${l.id}"><div class="row"><div><strong>${esc(l.name)}</strong> <span class="pill">${esc(l.status)}</span> ${l.product?`<span class="pill warn">${esc(l.product)}</span>`:''}<div class="tiny">${fmtDate(l.date)} • ${esc(l.source||'No source')} • ${esc(l.nextAction||'No next action')}</div><div>${esc(l.notes||'')}</div></div><button class="secondary small" type="button" onclick="deleteLead('${l.id}',${business?'true':'false'})">Delete</button></div></div>`).join(''):'<div class="muted">No leads saved yet.</div>'}</div>`; }
+function contentListHtml(arr,business=false){ return `<div class="list">${arr.length?arr.slice().reverse().map(c=>`<div class="item" id="${business?'bizcontent-item-':'content-item-'}${c.id}"><strong>${esc(c.title)}</strong><div class="tiny">${fmtDate(c.date)} • ${esc(c.type)} • ${esc(c.platforms||'')}</div><div>${esc(c.description||'')}</div><div class="tiny">Likes: ${esc(c.likes||0)} • Comments: ${esc(c.comments||0)} • Shares: ${esc(c.shares||0)} • Saves/DMs: ${esc(c.saves||0)}</div></div>`).join(''):'<div class="muted">No content tracked yet.</div>'}</div>`; }
+function renderLeadTracker(){ const el=document.getElementById('lead-tracker'); el.innerHTML=`<div class="card"><h3>Add LWA Lead</h3>${leadFormHtml('leadForm','LWA')}</div><div class="card" style="margin-top:16px"><h3>Saved LWA Leads</h3>${leadListHtml(state.leads,false)}</div><div class="card" style="margin-top:16px"><h3>Content Tracking</h3>${contentFormHtml('contentForm','LWA')}${contentListHtml(state.content,false)}</div>`;
+  document.getElementById('leadForm').onsubmit=async e=>{e.preventDefault(); const fd=new FormData(e.target); state.leads.push({id:uid(),...Object.fromEntries(fd.entries())}); await saveState(); renderAll('lead-tracker'); e.target.reset(); document.querySelector('#leadForm [name="date"]').value=todayStr(); toast('leadFormMsg','LWA lead saved. Follow-up flow moved to calendar.');};
+  document.getElementById('contentForm').onsubmit=async e=>{e.preventDefault(); const fd=new FormData(e.target); state.content.push({id:uid(),...Object.fromEntries(fd.entries())}); await saveState(); renderAll('lead-tracker'); e.target.reset(); document.querySelector('#contentForm [name="date"]').value=todayStr(); toast('contentFormMsg','Content saved and added to calendar.');};
+}
+async function deleteLead(id,business){ if(business) state.businessLeads=state.businessLeads.filter(l=>l.id!==id); else state.leads=state.leads.filter(l=>l.id!==id); await saveState(); renderAll(document.querySelector('.section.active').id); }
+window.deleteLead = deleteLead;
+function renderYourBusiness(){ const el=document.getElementById('your-business'); const business=state.business; el.innerHTML=`<div class="card"><h3>Your Business Settings</h3><form id="businessForm" class="form-grid"><div><label>Business Name</label><input name="name" value="${esc(business.name)}" /></div><div><label>Main Offer</label><input name="offer" value="${esc(business.offer||'')}" /></div><div><label>Current Goal</label><input name="goal" value="${esc(business.goal||'')}" /></div><div><label>Best Platform</label><input name="platform" value="${esc(business.platform||'')}" /></div><div><label>Main Product</label><input name="product" value="${esc(business.product||'')}" /></div><div><label>Tagline / Positioning</label><input name="notesShort" value="${esc(business.notesShort||'')}" /></div><div class="wide"><label>Notes</label><textarea name="notes">${esc(business.notes||'')}</textarea></div><div class="wide"><button type="submit">Save Business Info</button><div class="success" id="businessMsg"></div></div></form></div>
+  <div class="card" style="margin-top:16px"><h3>${esc(business.name || 'Your Business')} Lead Tracker</h3>${leadFormHtml('businessLeadForm',esc(business.name || 'Business'))}</div>
+  <div class="card" style="margin-top:16px"><h3>${esc(business.name || 'Your Business')} Leads</h3>${leadListHtml(state.businessLeads,true)}</div>
+  <div class="card" style="margin-top:16px"><h3>${esc(business.name || 'Your Business')} Content Tracking</h3>${contentFormHtml('businessContentForm',esc(business.name || 'Business'))}${contentListHtml(state.businessContent,true)}</div>
+  <div class="card" style="margin-top:16px"><h3>${esc(business.name || 'Your Business')} Affiliate Pipeline</h3><form id="businessAffiliatePipelineForm" class="form-grid"><div><label>Name</label><input name="name" required /></div><div><label>Stage</label><select name="stage"><option>New Contact</option><option>Conversation Started</option><option>Sent Info</option><option>Watching</option><option>Follow Up</option><option>Closed</option></select></div><div><label>Date</label><input type="date" name="date" value="${todayStr()}" /></div><div><label>Platform</label><input name="platform" placeholder="Facebook, TikTok..." /></div><div><label>Product / Offer</label><input name="product" placeholder="Offer or product name" /></div><div class="wide"><label>Notes</label><textarea name="notes"></textarea></div><div class="wide"><button type="submit">Add Business Affiliate Lead</button><div class="success" id="businessAffiliatePipeMsg"></div></div></form><div class="list">${(state.businessAffiliatePipeline||[]).length?(state.businessAffiliatePipeline||[]).slice().reverse().map(a=>`<div class="item" id="businessaff-item-${a.id}"><strong>${esc(a.name)}</strong> <span class="pill warn">${esc(a.stage)}</span><div class="tiny">${fmtDate(a.date)} • ${esc(a.platform||'')} • ${esc(a.product||'')}</div><div>${esc(a.notes||'')}</div></div>`).join(''):'<div class="muted">No business affiliate pipeline leads yet.</div>'}</div></div>`;
+  document.getElementById('businessForm').onsubmit=async e=>{e.preventDefault(); const fd=Object.fromEntries(new FormData(e.target).entries()); state.business=fd; state.settings.businessName=fd.name || state.settings.businessName; await saveState(); renderAll('your-business'); toast('businessMsg','Business tab saved.');};
+  document.getElementById('businessLeadForm').onsubmit=async e=>{e.preventDefault(); const fd=new FormData(e.target); state.businessLeads.push({id:uid(),...Object.fromEntries(fd.entries())}); await saveState(); renderAll('your-business'); e.target.reset(); document.querySelector('#businessLeadForm [name="date"]').value=todayStr(); toast('businessLeadFormMsg','Business lead saved. Follow-up flow moved to calendar.');};
+  document.getElementById('businessContentForm').onsubmit=async e=>{e.preventDefault(); const fd=new FormData(e.target); state.businessContent.push({id:uid(),...Object.fromEntries(fd.entries())}); await saveState(); renderAll('your-business'); e.target.reset(); document.querySelector('#businessContentForm [name="date"]').value=todayStr(); toast('businessContentFormMsg','Business content saved and added to calendar.');};
+  document.getElementById('businessAffiliatePipelineForm').onsubmit=async e=>{
+    e.preventDefault();
+    const obj={id:uid(),...Object.fromEntries(new FormData(e.target).entries())};
+    state.businessAffiliatePipeline = state.businessAffiliatePipeline || [];
+    state.businessAffiliatePipeline.push(obj);
+    state.tasks.push({
+      id:'biz-aff-'+obj.id,
+      title:(state.business.name || state.settings.businessName || 'Your Business') + ' affiliate follow-up: ' + obj.name,
+      date:obj.date,
+      kind:'task',
+      priority:'Normal',
+      notes:[obj.stage,obj.platform,obj.product,obj.notes].filter(Boolean).join(' • ')
+    });
+    await saveState();
+    renderAll('your-business');
+    e.target.reset();
+    document.querySelector('#businessAffiliatePipelineForm [name="date"]').value=todayStr();
+    toast('businessAffiliatePipeMsg','Business affiliate pipeline saved and moved to calendar.');
+  };
+}
+function renderCalendar(){ const el=document.getElementById('calendar'); const now=state.currentMonth?new Date(state.currentMonth+'-01T12:00:00'):new Date(); state.currentMonth=now.toISOString().slice(0,7); const year=now.getFullYear(), month=now.getMonth(); const first=new Date(year,month,1), last=new Date(year,month+1,0); const startDay=(first.getDay()+6)%7; const items=allCalendarItems(); let cells=[]; for(let i=0;i<startDay;i++) cells.push('<div class="cal-day"></div>');
+  for(let d=1; d<=last.getDate(); d++){ const ds=new Date(year,month,d,12).toISOString().slice(0,10); const dayItems=items.filter(i=>i.date===ds).slice(0,5); cells.push(`<div class="cal-day"><div class="num">${d}</div>${dayItems.map(i=>`<span class="badge clickable" data-open-item="${esc(i.id)}" title="Open ${esc(i.title)}">${esc(i.title)}</span>`).join('')}</div>`); }
+  const agenda=items.filter(i=>i.date>=todayStr()).slice(0,30); const selected=resolveCalendarItem(state.selectedCalendarItemId)?.item || null;
+  el.innerHTML=`<div class="split"><div class="card"><div class="toolbar"><button class="secondary small" id="prevMonth" type="button">←</button><strong>${now.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</strong><button class="secondary small" id="nextMonth" type="button">→</button></div><div class="calendar">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-head">${d}</div>`).join('')}${cells.join('')}</div></div>
+  <div><div class="card"><h3>Upcoming Agenda</h3><div class="list agenda-list">${agenda.length?agenda.map(a=>`<div class="item clickable" data-open-item="${esc(a.id)}"><div><strong>${esc(a.title)}</strong><div class="tiny">${fmtDate(a.date)}</div></div><span class="pill ${a.kind==='followup'?'warn':a.kind==='lead'?'ok':a.kind==='content'?'':'danger'}">${esc(a.kind)}</span></div>`).join(''):'<div class="muted">Nothing upcoming yet.</div>'}</div></div><div class="card" id="calendarTaskDetail" style="margin-top:16px"><h3>Selected Calendar Item</h3>${selected?`<div class="item"><strong>${esc(selected.title||selected.name||'Item')}</strong><div class="tiny">${fmtDate(selected.date)} • ${esc(selected.kind||'task')}</div>${selected.status?`<div><span class="pill">${esc(selected.status)}</span></div>`:''}${selected.product?`<div class="tiny">Product / Offer: ${esc(selected.product)}</div>`:''}${selected.source?`<div class="tiny">Source: ${esc(selected.source)}</div>`:''}${selected.platforms?`<div class="tiny">Where: ${esc(selected.platforms)}</div>`:''}${selected.notes?`<div>${esc(selected.notes)}</div>`:''}${selected.nextAction?`<div class="tiny">Next action: ${esc(selected.nextAction)}</div>`:''}<div style="margin-top:10px">${resolveCalendarItem(state.selectedCalendarItemId)?.targetSection && resolveCalendarItem(state.selectedCalendarItemId)?.targetSection!=='calendar' ? `<button class="secondary small" type="button" id="openRelatedBtn">Open Related Record</button>` : ''}</div></div>`:'<div class="muted">Click any task, follow-up, lead, or content item in the calendar to open it here or jump to its section.</div>'}</div><div class="card" style="margin-top:16px"><h3>Quick Add Task</h3><form id="taskForm" class="form-grid"><div><label>Task</label><input name="title" required /></div><div><label>Date</label><input type="date" name="date" value="${todayStr()}" required /></div><div><label>Type</label><select name="kind"><option value="task">Task To Do</option><option value="followup">Manual Follow Up</option><option value="appointment">Appointment</option></select></div><div><label>Priority</label><select name="priority"><option>Normal</option><option>High</option></select></div><div class="wide"><label>Notes</label><textarea name="notes"></textarea></div><div class="wide"><button type="submit">Save Task</button><div class="success" id="taskMsg"></div></div></form></div></div></div>`;
+  document.getElementById('prevMonth').onclick=()=>{ const d=new Date(year,month-1,1); state.currentMonth=d.toISOString().slice(0,7); renderCalendar(); };
+  document.getElementById('nextMonth').onclick=()=>{ const d=new Date(year,month+1,1); state.currentMonth=d.toISOString().slice(0,7); renderCalendar(); };
+  el.querySelectorAll('[data-open-item]').forEach(node=>node.onclick=()=>openCalendarItem(node.dataset.openItem));
+  if(document.getElementById('openRelatedBtn')) document.getElementById('openRelatedBtn').onclick=()=>openCalendarItem(state.selectedCalendarItemId);
+  document.getElementById('taskForm').onsubmit=async e=>{e.preventDefault(); const fd=new FormData(e.target); state.tasks.push({id:uid(),...Object.fromEntries(fd.entries())}); await saveState(); renderAll('calendar'); e.target.reset(); document.querySelector('#taskForm [name="date"]').value=todayStr(); toast('taskMsg','Task saved to calendar.');};
+}
+function renderBrandSettings(){ const el=document.getElementById('brand-settings'); el.innerHTML=`<div class="card"><h3>Brand Settings</h3><form id="brandForm" class="form-grid"><div><label>Brand Name</label><input name="brandName" value="${esc(state.settings.brandName||'')}" /></div><div><label>Editable Business Name</label><input name="businessName" value="${esc(state.settings.businessName||'')}" /></div><div><label>Tagline</label><input name="tagline" value="${esc(state.settings.tagline||'')}" /></div><div><label>Brand Colors</label><input name="colors" value="${esc(state.settings.colors||'')}" placeholder="Purple, gold, black" /></div><div class="wide"><label>Voice / Messaging Notes</label><textarea name="voice">${esc(state.settings.voice||'')}</textarea></div><div class="wide"><label>Platforms (comma separated)</label><input name="platforms" value="${esc((state.settings.platforms||[]).join(', '))}" /></div><div class="wide"><button type="submit">Save Brand Settings</button><div class="success" id="brandMsg"></div></div></form></div>`;
+  document.getElementById('brandForm').onsubmit=async e=>{e.preventDefault(); const fd=new FormData(e.target); state.settings={brandName:fd.get('brandName'),businessName:fd.get('businessName'),tagline:fd.get('tagline'),colors:fd.get('colors'),voice:fd.get('voice'),platforms:String(fd.get('platforms')).split(',').map(s=>s.trim()).filter(Boolean)}; if(!state.business.name || state.business.name==='Your Business') state.business.name=fd.get('businessName')||state.business.name; await saveState(); renderAll('brand-settings'); toast('brandMsg','Brand settings saved.');};
+}
+function getCurrentWeekDates(){
+  const today=new Date();
+  const day=today.getDay();
+  const mondayOffset=(day===0?-6:1-day);
+  const monday=new Date(today.getFullYear(), today.getMonth(), today.getDate()+mondayOffset);
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const out={};
+  days.forEach((label,idx)=>{ const d=new Date(monday.getFullYear(), monday.getMonth(), monday.getDate()+idx); out[label]=d.toISOString().slice(0,10); });
+  return out;
+}
+function renderWeeklyDashboard(){ const el=document.getElementById('weekly-dashboard'); const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']; const weekDates=getCurrentWeekDates(); el.innerHTML=`<div class="card"><h3>Weekly Dashboard</h3><p class="muted">Save your weekly plan here. Each saved day also moves into Weekly Flow and the Calendar for the current week.</p><div class="week-grid">${days.map(day=>`<div class="day-box"><h4>${day}</h4><div class="tiny" style="margin-bottom:8px">${fmtDate(weekDates[day])}</div><textarea data-weekday="${day}" placeholder="Write your focus, posts, follow-ups, appointments...">${esc(state.weekly[day]||'')}</textarea></div>`).join('')}</div><div style="margin-top:14px"><button id="saveWeekly" type="button">Save Weekly Dashboard</button><div class="success" id="weeklyMsg"></div></div></div>`;
+  document.getElementById('saveWeekly').onclick=async ()=>{
+    el.querySelectorAll('textarea[data-weekday]').forEach(t=>state.weekly[t.dataset.weekday]=t.value.trim());
+    state.weeklyFlow = (state.weeklyFlow||[]).filter(item=>item.source!=='weekly-dashboard');
+    state.tasks = (state.tasks||[]).filter(item=>item.source!=='weekly-dashboard');
+    days.forEach(day=>{
+      const notes=(state.weekly[day]||'').trim();
+      if(!notes) return;
+      const id='wd-'+day.toLowerCase();
+      const date=weekDates[day];
+      state.weeklyFlow.push({id,title:`${day} plan`,day,date,kind:'task',notes,source:'weekly-dashboard'});
+      state.tasks.push({id:'task-'+id,title:`${day} plan`,date,kind:'task',priority:'Normal',notes,source:'weekly-dashboard'});
+    });
+    await saveState();
+    renderAll('weekly-dashboard');
+    toast('weeklyMsg','Weekly dashboard saved and moved into Weekly Flow and Calendar.');
+  };
+}
+function renderWeeklyFlow(){ const el=document.getElementById('weekly-flow'); el.innerHTML=`<div class="card"><h3>Weekly Flow</h3><form id="flowForm" class="form-grid"><div><label>Flow Step</label><input name="title" required placeholder="Example: Monday outreach block" /></div><div><label>Day</label><select name="day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div><div><label>Date To Calendar</label><input type="date" name="date" value="${todayStr()}" /></div><div><label>Type</label><select name="kind"><option value="task">Task</option><option value="followup">Follow-up</option></select></div><div class="wide"><label>Notes</label><textarea name="notes"></textarea></div><div class="wide"><button type="submit">Add Weekly Flow Step</button><div class="success" id="flowMsg"></div></div></form><div class="list">${state.weeklyFlow.length?state.weeklyFlow.slice().reverse().map(f=>`<div class="item"><strong>${esc(f.title)}</strong><div class="tiny">${esc(f.day)} • ${fmtDate(f.date||todayStr())}</div><div>${esc(f.notes||'')}</div></div>`).join(''):'<div class="muted">No weekly flow steps added yet.</div>'}</div></div>`;
+  document.getElementById('flowForm').onsubmit=async e=>{e.preventDefault(); const fd=Object.fromEntries(new FormData(e.target).entries()); const id=uid(); state.weeklyFlow.push({id,...fd}); state.tasks.push({id:'wf-'+id,title:fd.title,date:fd.date,kind:fd.kind,priority:'Normal',notes:fd.notes}); await saveState(); renderAll('weekly-flow'); e.target.reset(); document.querySelector('#flowForm [name="date"]').value=todayStr(); toast('flowMsg','Weekly flow saved and moved to calendar.');};
+}
+function renderDailyTracker(){ const el=document.getElementById('daily-tracker'); const currentDate=todayStr(); const d=state.daily[currentDate] || {followUps:false,outreach:false,content:false,stories:false,live:false,notes:'',platforms:[],contentDescription:'',contentWhere:'',likes:0,comments:0,shares:0,saves:0}; const savedEntries=Object.entries(state.daily||{}).sort((a,b)=>b[0].localeCompare(a[0])); el.innerHTML=`<div class="card"><h3>Daily Tracker - ${fmtDate(currentDate)}</h3><div class="check-grid">${['followUps','outreach','content','stories','live'].map(k=>`<label class="item"><input type="checkbox" data-daycheck="${k}" ${d[k]?'checked':''} /> ${k.replace(/([A-Z])/g,' $1')}</label>`).join('')}</div><div style="margin-top:12px"><label>Notes</label><textarea id="dailyNotes">${esc(d.notes||'')}</textarea></div><div style="margin-top:18px"><h3>Platform Checkboxes</h3><div class="check-grid">${['Facebook','TikTok','Instagram','Email','Messenger','Group'].map(p=>`<label class="item"><input type="checkbox" data-platform="${p}" ${(d.platforms||[]).includes(p)?'checked':''}/> ${p}</label>`).join('')}</div></div><div class="grid cols-2" style="margin-top:16px"><div><label>What content did you do today?</label><textarea id="dailyContentDescription">${esc(d.contentDescription||'')}</textarea></div><div><label>Where did you put it?</label><input id="dailyContentWhere" value="${esc(d.contentWhere||'')}" placeholder="Facebook Reel, TikTok, group..." /></div><div><label>Likes</label><input type="number" id="dailyLikes" value="${esc(d.likes||0)}" /></div><div><label>Comments</label><input type="number" id="dailyComments" value="${esc(d.comments||0)}" /></div><div><label>Shares</label><input type="number" id="dailyShares" value="${esc(d.shares||0)}" /></div><div><label>Saves / DMs</label><input type="number" id="dailySaves" value="${esc(d.saves||0)}" /></div></div><div style="margin-top:12px"><button id="saveDaily" type="button">Save Daily Tracker</button><div class="success" id="dailyMsg"></div></div></div><div class="card" style="margin-top:16px"><h3>Saved Daily Entries</h3><div class="list">${savedEntries.length?savedEntries.map(([date,entry])=>`<div class="item"><strong>${fmtDate(date)}</strong><div class="tiny">${['followUps','outreach','content','stories','live'].filter(k=>entry[k]).map(k=>k.replace(/([A-Z])/g,' $1')).join(' • ') || 'No boxes checked'}</div><div>${esc(entry.contentDescription||entry.notes||'')}</div><div class="tiny">${esc(entry.contentWhere||'')}</div><div class="tiny">Platforms: ${esc((entry.platforms||[]).join(', ') || 'None')}</div><div class="tiny">Likes ${esc(entry.likes||0)} • Comments ${esc(entry.comments||0)} • Shares ${esc(entry.shares||0)} • Saves/DMs ${esc(entry.saves||0)}</div></div>`).join(''):'<div class="muted">No daily tracker entries saved yet.</div>'}</div></div>`;
+  document.getElementById('saveDaily').onclick=async ()=>{ const obj={notes:document.getElementById('dailyNotes').value,platforms:[...el.querySelectorAll('[data-platform]:checked')].map(i=>i.dataset.platform),contentDescription:document.getElementById('dailyContentDescription').value,contentWhere:document.getElementById('dailyContentWhere').value,likes:document.getElementById('dailyLikes').value,comments:document.getElementById('dailyComments').value,shares:document.getElementById('dailyShares').value,saves:document.getElementById('dailySaves').value}; el.querySelectorAll('[data-daycheck]').forEach(i=>obj[i.dataset.daycheck]=i.checked); state.daily[currentDate]=obj; await saveState(); renderAll('daily-tracker'); toast('dailyMsg','Daily tracker saved and added below plus dashboard.'); };
+}
+function renderAffiliateHealth(){ const el=document.getElementById('affiliate-health'); const a=state.affiliate||{goal:20,outreach:0,followUps:0,enrollments:0,notes:''}; const pct=Math.min(100,Math.round(((+a.outreach + +a.followUps + (+a.enrollments*3)) / Math.max(1,(+a.goal*2))) *100)); el.innerHTML=`<div class="grid cols-2"><div class="card"><h3>Affiliate Health</h3><div class="muted">Momentum Score</div><div class="metric">${pct}%</div><div class="kpi-bar"><span style="width:${pct}%"></span></div><form id="affiliateForm" class="form-grid" style="margin-top:14px"><div><label>Weekly Outreach Goal</label><input type="number" name="goal" value="${a.goal}" /></div><div><label>Outreach Done</label><input type="number" name="outreach" value="${a.outreach}" /></div><div><label>Follow-ups Done</label><input type="number" name="followUps" value="${a.followUps}" /></div><div><label>Enrollments / Sales</label><input type="number" name="enrollments" value="${a.enrollments}" /></div><div class="wide"><label>Notes</label><textarea name="notes">${esc(a.notes||'')}</textarea></div><div class="wide"><button type="submit">Save Affiliate Health</button><div class="success" id="affiliateMsg"></div></div></form></div><div class="card"><h3>Affiliate Pipeline</h3><form id="affiliatePipelineForm" class="form-grid"><div><label>Name</label><input name="name" required /></div><div><label>Stage</label><select name="stage"><option>New Contact</option><option>Conversation Started</option><option>Sent Info</option><option>Watching</option><option>Follow Up</option><option>Closed</option></select></div><div><label>Date</label><input type="date" name="date" value="${todayStr()}" /></div><div><label>Platform</label><input name="platform" placeholder="Facebook, TikTok..." /></div><div class="wide"><label>Notes</label><textarea name="notes"></textarea></div><div class="wide"><button type="submit">Add Affiliate Pipeline Lead</button><div class="success" id="affiliatePipeMsg"></div></div></form><div class="list">${state.affiliatePipeline.length?state.affiliatePipeline.slice().reverse().map(a=>`<div class="item"><strong>${esc(a.name)}</strong> <span class="pill warn">${esc(a.stage)}</span><div class="tiny">${fmtDate(a.date)} • ${esc(a.platform||'')}</div><div>${esc(a.notes||'')}</div></div>`).join(''):'<div class="muted">No affiliate pipeline leads yet.</div>'}</div></div></div>`;
+  document.getElementById('affiliateForm').onsubmit=async e=>{e.preventDefault(); state.affiliate=Object.fromEntries(new FormData(e.target).entries()); await saveState(); renderAll('affiliate-health'); toast('affiliateMsg','Affiliate health saved.');};
+  document.getElementById('affiliatePipelineForm').onsubmit=async e=>{e.preventDefault(); const obj={id:uid(),...Object.fromEntries(new FormData(e.target).entries())}; state.affiliatePipeline.push(obj); state.tasks.push({id:'aff-'+obj.id,title:'Affiliate follow-up: '+obj.name,date:obj.date,kind:'task',priority:'Normal',notes:obj.notes}); await saveState(); renderAll('affiliate-health'); e.target.reset(); document.querySelector('#affiliatePipelineForm [name="date"]').value=todayStr(); toast('affiliatePipeMsg','Affiliate pipeline lead saved and moved to calendar.');};
+}
+function renderAmbassadorPipeline(){ const el=document.getElementById('ambassador-pipeline'); el.innerHTML=`<div class="card"><h3>Ambassador Pipeline</h3><form id="ambForm" class="form-grid"><div><label>Name</label><input name="name" required /></div><div><label>Stage</label><select name="stage"><option>New Contact</option><option>Interested</option><option>Sent Info</option><option>Waiting</option><option>Active</option></select></div><div><label>Date</label><input type="date" name="date" value="${todayStr()}" /></div><div><label>Platform</label><input name="platform" placeholder="Facebook, TikTok..." /></div><div class="wide"><label>Notes</label><textarea name="notes"></textarea></div><div class="wide"><button type="submit">Add Ambassador</button><div class="success" id="ambMsg"></div></div></form><div class="list">${state.ambassadors.length?state.ambassadors.slice().reverse().map(a=>`<div class="item"><div class="row"><div><strong>${esc(a.name)}</strong> <span class="pill">${esc(a.stage)}</span><div class="tiny">${fmtDate(a.date)} • ${esc(a.platform||'')}</div><div>${esc(a.notes||'')}</div></div></div></div>`).join(''):'<div class="muted">No ambassadors saved yet.</div>'}</div></div>`;
+  document.getElementById('ambForm').onsubmit=async e=>{e.preventDefault(); const obj={id:uid(),...Object.fromEntries(new FormData(e.target).entries())}; state.ambassadors.push(obj); state.tasks.push({id:'amb-'+obj.id,title:'Ambassador follow-up: '+obj.name,date:obj.date,kind:'task',priority:'Normal',notes:obj.notes}); await saveState(); renderAll('ambassador-pipeline'); e.target.reset(); document.querySelector('#ambForm [name="date"]').value=todayStr(); toast('ambMsg','Ambassador saved and moved to calendar.');};
+}
+function renderReflection(){ const el=document.getElementById('reflection-section'); el.innerHTML=`<div class="card"><h3>Reflection Section</h3><form id="reflectionForm" class="form-grid"><div><label>Date</label><input type="date" name="date" value="${todayStr()}" /></div><div><label>Big Win</label><input name="win" /></div><div class="wide"><label>Lesson</label><textarea name="lesson"></textarea></div><div class="wide"><label>Gratitude</label><textarea name="gratitude"></textarea></div><div class="wide"><label>Tomorrow's Focus</label><textarea name="focus"></textarea></div><div class="wide"><button type="submit">Save Reflection</button><div class="success" id="reflectMsg"></div></div></form><div class="list">${state.reflections.length?state.reflections.slice().reverse().map(r=>`<div class="item"><strong>${fmtDate(r.date)}</strong><div><span class="pill ok">Win</span>${esc(r.win||'')}</div><div><span class="pill warn">Lesson</span>${esc(r.lesson||'')}</div><div><span class="pill">Gratitude</span>${esc(r.gratitude||'')}</div><div><span class="pill danger">Tomorrow</span>${esc(r.focus||'')}</div></div>`).join(''):'<div class="muted">No reflections saved yet.</div>'}</div></div>`;
+  document.getElementById('reflectionForm').onsubmit=async e=>{e.preventDefault(); state.reflections.push({id:uid(),...Object.fromEntries(new FormData(e.target).entries())}); await saveState(); renderAll('reflection-section'); e.target.reset(); document.querySelector('#reflectionForm [name="date"]').value=todayStr(); toast('reflectMsg','Reflection saved.');};
+}
+
+function csvEscape(value){ const v = value == null ? '' : String(value); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; }
+function toCSV(rows){ if(!rows.length) return 'No Data\n'; const headerSet=new Set(); rows.forEach(r=>Object.keys(r||{}).forEach(k=>headerSet.add(k))); const headers=[...headerSet]; const lines=[headers.join(',')]; rows.forEach(r=>{ lines.push(headers.map(h=>csvEscape(Array.isArray(r[h]) ? r[h].join(' | ') : (typeof r[h]==='object' && r[h]!==null ? JSON.stringify(r[h]) : r[h]))).join(',')); }); return lines.join('\n'); }
+function downloadFile(filename, content, type='text/plain'){ const blob=new Blob([content],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); }
+function csvExports(){
+  return [
+    ['LWA_Leads.csv', state.leads],
+    ['Your_Business_Leads.csv', state.businessLeads],
+    ['Tasks.csv', state.tasks],
+    ['Calendar.csv', calendarItems()],
+    ['Content.csv', state.content],
+    ['Your_Business_Content.csv', state.businessContent],
+    ['Daily_Tracker.csv', Object.entries(state.daily||{}).map(([date,data])=>({date,...data}))],
+    ['Weekly_Dashboard.csv', weeklyEntries()],
+    ['Weekly_Flow.csv', state.weeklyFlow],
+    ['Affiliate_Pipeline.csv', state.affiliatePipeline],
+    ['Your_Business_Affiliate_Pipeline.csv', state.businessAffiliatePipeline],
+    ['Ambassador_Pipeline.csv', state.ambassadors],
+    ['Brand_Settings.csv', [state.settings, state.business]],
+    ['Reflections.csv', state.reflections]
+  ];
+}
+function exportSingleCsv(filename, rows){
+  downloadFile(filename, toCSV(rows||[]), 'text/csv;charset=utf-8');
+}
+function openCsvExportCenter(){
+  const modal=document.getElementById('csvModal');
+  const grid=document.getElementById('csvExportGrid');
+  if(!modal || !grid) return;
+  grid.innerHTML='';
+  csvExports().forEach(([name,rows])=>{
+    const wrap=document.createElement('div');
+    wrap.className='card';
+    const clean=name.replace(/\.csv$/i,'').replace(/_/g,' ');
+    wrap.innerHTML=`<div><strong>${clean}</strong></div><div class="tiny" style="margin:6px 0 12px">${(rows||[]).length} record(s)</div><button class="small" type="button">Export</button>`;
+    wrap.querySelector('button').onclick=()=>exportSingleCsv(name, rows);
+    grid.appendChild(wrap);
+  });
+  const all=document.createElement('div');
+  all.className='card';
+  all.style.gridColumn='1/-1';
+  all.innerHTML='<div><strong>Export All</strong></div><div class="tiny" style="margin:6px 0 12px">Some phones block many downloads at once. If that happens, use the single export buttons above.</div><button class="gold" type="button">Try Export All</button>';
+  all.querySelector('button').onclick=()=>{ csvExports().forEach(([name,rows],i)=>setTimeout(()=>exportSingleCsv(name, rows), i*350)); };
+  grid.appendChild(all);
+  modal.style.display='block';
+}
+function closeCsvExportCenter(){ const modal=document.getElementById('csvModal'); if(modal) modal.style.display='none'; }
+
+async function testSyncUrl(){
+  const msg=document.getElementById('syncMsg');
+  const status=document.getElementById('syncStatus');
+  const url=(state.syncSettings.webAppUrl||'').trim();
+  if(!url){ if(msg) msg.textContent='Add your Web App URL first.'; return; }
+  try{
+    const res=await fetch(url + (url.includes('?')?'&':'?') + 'sheet=LWA_Leads', {method:'GET'});
+    state.syncSettings.lastTest=new Date().toLocaleString();
+    state.syncSettings.lastStatus=res.ok ? 'Connection test reached your script.' : 'Script responded, but not with OK.';
+    await saveState();
+    renderSyncSettings();
+    if(msg) msg.textContent=res.ok ? 'Connection test reached your script.' : 'The URL responded, but not with OK.';
+  }catch(err){
+    state.syncSettings.lastTest=new Date().toLocaleString();
+    state.syncSettings.lastStatus='Could not reach that URL from the app.';
+    await saveState();
+    renderSyncSettings();
+    if(msg) msg.textContent='Could not reach that URL from the app.';
+  }
+}
+function renderSyncSettings(){
+  const el=document.getElementById('sync-settings');
+  const ss=state.syncSettings||{};
+  el.innerHTML=`<div class="card"><h3>Sync Settings</h3><p class="muted">This page is for your own private sync setup. Put in your own Google Apps Script Web App URL on both your phone and computer. No one else sees your records unless they use your exact URL.</p><form id="syncForm" class="form-grid"><div><label>Sync Provider</label><input name="provider" value="${esc(ss.provider||'Google Apps Script')}" /></div><div><label>Google Sheet Name / Label</label><input name="sheetName" value="${esc(ss.sheetName||'')}" placeholder="Example: April Daytimer Database" /></div><div class="wide"><label>Google Apps Script Web App URL</label><input name="webAppUrl" value="${esc(ss.webAppUrl||'')}" placeholder="https://script.google.com/macros/s/.../exec" /></div><div class="wide"><label>Private Notes</label><textarea name="notes" placeholder="Use the same Web App URL on both your own devices to keep them linked.">${esc(ss.notes||'')}</textarea></div><div class="wide row"><button type="submit">Save Sync Settings</button><button class="secondary" type="button" id="testSyncBtn">Test Connection</button><button class="secondary" type="button" id="clearSyncBtn">Clear Sync Settings</button><div class="success" id="syncMsg"></div></div></form></div><div class="card" style="margin-top:16px"><h3>At a Glance</h3><div class="list"><div class="item"><div><strong>Current URL</strong><div class="tiny">${ss.webAppUrl?esc(ss.webAppUrl):'No URL saved yet.'}</div></div><span class="pill">${esc(ss.provider||'Google Apps Script')}</span></div><div class="item"><div><strong>Last Test</strong><div class="tiny">${ss.lastTest?esc(ss.lastTest):'Not tested yet.'}</div></div><span class="pill ${ss.lastStatus&&ss.lastStatus.includes('reached')?'ok':ss.lastStatus?'warn':''}" id="syncStatus">${esc(ss.lastStatus||'No connection test yet.')}</span></div></div><div class="tiny" style="margin-top:10px">To sync only your own phone and computer, use the same Web App URL on both devices. Anyone else should create their own Google Sheet and their own Apps Script URL.</div></div><div class="card" style="margin-top:16px"><h3>Instructions For People Using This App</h3><ol class="tiny" style="padding-left:18px;line-height:1.7"><li>Create your own Google Sheet.</li><li>Open Extensions → Apps Script inside that sheet.</li><li>Paste your own Apps Script code and deploy it as a Web App.</li><li>Copy your own Web App URL.</li><li>Open this app on your phone and computer.</li><li>Go to Sync Settings on both devices.</li><li>Paste the exact same Web App URL on both of your own devices.</li><li>Tap Save Sync Settings.</li><li>Use Test Connection to confirm the URL is reachable.</li><li>Do not share your URL if you want your data private.</li></ol><div class="tiny" style="margin-top:10px">This template does not force everyone into one shared database. Each person is meant to connect their own setup.</div></div>`;
+  document.getElementById('syncForm').onsubmit=async e=>{e.preventDefault(); state.syncSettings=Object.assign({}, state.syncSettings, Object.fromEntries(new FormData(e.target).entries())); await saveState(); renderSyncSettings(); toast('syncMsg','Sync settings saved.');};
+  document.getElementById('testSyncBtn').onclick=()=>testSyncUrl();
+  document.getElementById('clearSyncBtn').onclick=async ()=>{ state.syncSettings=defaultState().syncSettings; await saveState(); renderSyncSettings(); toast('syncMsg','Sync settings cleared.'); };
+}
+
+function renderAll(activeId){ document.getElementById('sideBrand').textContent=state.settings.brandName || 'LegacyBuilt Daytimer'; renderDashboard(); renderLeadTracker(); renderYourBusiness(); renderCalendar(); renderBrandSettings(); renderWeeklyDashboard(); renderWeeklyFlow(); renderDailyTracker(); renderAffiliateHealth(); renderAmbassadorPipeline(); renderReflection(); renderSyncSettings(); if(activeId) showSectionSilently(activeId); }
+function showSectionSilently(id){ document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active', s.id===id)); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.target===id)); const info=sections.find(s=>s.id===id); if(info){ document.getElementById('pageTitle').textContent=info.label; document.getElementById('pageSubtitle').textContent=info.subtitle; } }
+function wireImportExport(){ document.getElementById('exportBtn').onclick=()=>{ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='legacybuilt-daytimer-backup.json'; a.click();}; document.getElementById('openSyncBtn').onclick=()=>showSection('sync-settings'); document.getElementById('importInput').onchange=async e=>{ const file=e.target.files[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); Object.keys(state).forEach(k=>delete state[k]); Object.assign(state, defaultState(), data); await saveState(); renderAll(document.querySelector('.section.active')?.id || 'dashboard'); alert('Backup imported.'); } catch(err){ alert('Import failed.'); } e.target.value=''; }; }
+window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); deferredPrompt=e; document.getElementById('installBtn').style.display='inline-block'; });
+document.getElementById('installBtn').onclick=async ()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; document.getElementById('installBtn').style.display='none'; };
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js')); }
+(async function init(){ navRender(); await openDB(); await loadState(); wireImportExport(); renderAll('dashboard'); })();
+</script>
+</body>
+</html>
