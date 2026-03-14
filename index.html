@@ -347,3 +347,64 @@ if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.s
 </script>
 </body>
 </html>
+<script>
+
+/* ===== SYNC HELPER FUNCTIONS ===== */
+
+function getSyncSettings() {
+  const raw = localStorage.getItem("legacybuilt_sync_settings");
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+function getApiUrl() {
+  const settings = getSyncSettings();
+  return settings?.appsScriptUrl?.trim() || "";
+}
+
+async function syncSaveRow(sheet, row) {
+  const apiUrl = getApiUrl();
+
+  if (!apiUrl) {
+    alert("No Apps Script URL saved in Sync Settings.");
+    return { ok: false };
+  }
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify({
+      sheet,
+      row
+    })
+  });
+
+  return await response.json();
+}
+
+async function syncLoadRows(sheet) {
+  const apiUrl = getApiUrl();
+
+  if (!apiUrl) {
+    alert("No Apps Script URL saved in Sync Settings.");
+    return [];
+  }
+
+  const response = await fetch(`${apiUrl}?sheet=${sheet}`);
+  const result = await response.json();
+
+  if (!result.ok) return [];
+
+  return result.rows || [];
+}
+
+/* ===== END SYNC HELPERS ===== */
+
+</script>
