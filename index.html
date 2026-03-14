@@ -435,3 +435,45 @@ function loadSyncSettingsForm() {
   if (labelEl) labelEl.value = settings.sheetLabel || "";
   if (notesEl) notesEl.value = settings.privateNotes || "";
 }
+<script>
+
+/* STEP 5 — SAVE LWA LEAD TO GOOGLE SHEET */
+
+async function saveLwaLead() {
+  const name = document.getElementById("lwaLeadName")?.value.trim() || "";
+  const platform = document.getElementById("lwaLeadPlatform")?.value.trim() || "";
+  const status = document.getElementById("lwaLeadStatus")?.value.trim() || "";
+  const notes = document.getElementById("lwaLeadNotes")?.value.trim() || "";
+
+  if (!name) {
+    alert("Please enter a lead name.");
+    return;
+  }
+
+  const row = {
+    id: String(Date.now()),
+    name,
+    platform,
+    status,
+    date_added: new Date().toISOString().slice(0, 10),
+    notes
+  };
+
+  const result = await syncSaveRow("LWA_Leads", row);
+
+  if (!result.ok) {
+    alert("Save failed: " + (result.error || "Unknown error"));
+    return;
+  }
+
+  alert("LWA lead synced.");
+
+  document.getElementById("lwaLeadName").value = "";
+  document.getElementById("lwaLeadPlatform").value = "";
+  document.getElementById("lwaLeadStatus").value = "";
+  document.getElementById("lwaLeadNotes").value = "";
+
+  await renderLwaLeads();
+}
+
+</script>
